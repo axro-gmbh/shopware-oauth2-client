@@ -1,5 +1,12 @@
 <!-- CHANGELOGGER -->
 
+## [4.0.0] - 2026-02-01
+
+### Feature (2 changes)
+
+- refactored code and some fixes
+- Updated dependencies
+
 ## [3.0.0] - 2024-02-06
 
 ### Feature (2 changes)
