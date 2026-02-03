@@ -54,7 +54,7 @@ foreach(something...) {
 }
 $responses = $client->promise();
 
-// to return objects in numeric array instead of an array, set argument to true
+// to return an array of objects instead of an array of arrays, set argument to true
 $responses = $client->promise(true);
 ```
 
@@ -66,7 +66,7 @@ Indexing is set by default to "use-queue-indexing".
 You can change it to synchronously or disable.
 
 ```
-$client->indexing(const::INDEXING_SYNC)->requestAsync('PATCH', '/api/_action/example_extension/update', $payload);
+$client->indexing(ShopwareClient::INDEXING_SYNC)->requestAsync('PATCH', '/api/_action/example_extension/update', $payload);
 ```
 
 Following constants are defined for sync behavior in ShopwareClient:

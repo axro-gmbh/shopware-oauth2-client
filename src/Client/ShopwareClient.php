@@ -38,7 +38,7 @@ class ShopwareClient
         $this->indexingBehavior = self::INDEXING_QUEUE;
     }
 
-    public function indexing(string $indexingBehavior): ShopwareClient
+    public function indexing(?string $indexingBehavior): ShopwareClient
     {
         $this->indexingBehavior = $indexingBehavior;
         return $this;
@@ -70,15 +70,16 @@ class ShopwareClient
                     'method' => $method
                 ]
             );
-
-            throw new $e(
-                $e->getMessage(),
-                $e->getRequest(),
-                $e->getResponse()
-            );
+            throw $e;
         }
 
-        $responseBody = $response->getBody()->getContents();
+        $responseBody = '';
+        $responseStream = $response->getBody();
+        try {
+            $responseBody = $responseStream->getContents();
+        } finally {
+            $responseStream->close();
+        }
         if (empty($responseBody)) {
             return true;
         }
@@ -112,14 +113,21 @@ class ShopwareClient
     public function promise($returnObject = false): mixed
     {
         $results = Utils::all($this->promises)->wait();
+        $this->promises = [];
         unset($responses); // @phpstan-ignore-line
         $responses = [];
 
         foreach ($results as $result) {
+            $resultStream = $result->getBody();
+            try {
+                $body = $resultStream->getContents();
+            } finally {
+                $resultStream->close();
+            }
             if ($returnObject) {
-                $responses = json_decode($result->getBody(), false, 512, JSON_THROW_ON_ERROR);
+                $responses[] = json_decode($body, false, 512, JSON_THROW_ON_ERROR);
             } else {
-                $responses[] = json_decode($result->getBody(), true, 512, JSON_THROW_ON_ERROR);
+                $responses[] = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
             }
         }
         return $responses;
